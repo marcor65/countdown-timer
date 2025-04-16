@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Countdown Timer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2rem;
+      background-color: #f5f5f5;
+    }
+    #display {
+      font-size: 3rem;
+      margin: 1rem 0;
+    }
+    .warning {
+      color: orange;
+    }
+    .critical {
+      color: red;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1.2rem;
+      margin: 0.5rem;
+    }
+    #alerts {
+      font-size: 1.5rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h2>Countdown Timer</h2>
+
+  <label for="referenceTime">Set Reference Time (mm:ss:ms):</label><br />
+  <input type="text" id="referenceTime" value="01:20:000" /><br /><br />
+
+  <div id="display">--:--:---</div>
+  <button onclick="startCountdown()">START</button>
+  <button onclick="stopCountdown()">STOP / RESET</button>
+
+  <div id="alerts"></div>
+
+  <script>
+    let countdownInterval;
+    let endTime;
+
+    function parseTime(input) {
+      const [min, sec, ms] = input.split(":").map(Number);
+      return (min * 60 * 1000) + (sec * 1000) + ms;
+    }
+
+    function formatTime(ms) {
+      const min = Math.floor(ms / 60000);
+      const sec = Math.floor((ms % 60000) / 1000);
+      const milli = ms % 1000;
+      return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}:${String(milli).padStart(3, '0')}`;
+    }
+
+    function startCountdown() {
+      const ref = document.getElementById("referenceTime").value;
+      const duration = parseTime(ref);
+      endTime = Date.now() + duration;
+      clearInterval(countdownInterval);
+
+      countdownInterval = setInterval(() => {
+        const remaining = endTime - Date.now();
+        const display = document.getElementById("display");
+        const alerts = document.getElementById("alerts");
+
+        if (remaining <= 0) {
+          display.textContent = "00:00:000";
+          alerts.textContent = "🚀 GO!";
+          alerts.className = "critical";
+          clearInterval(countdownInterval);
+          return;
+        }
+
+        display.textContent = formatTime(remaining);
+        alerts.textContent = "";
+        alerts.className = "";
+
+        if (remaining <= 10000) {
+          const sec = Math.ceil(remaining / 1000);
+          alerts.textContent = sec;
+          alerts.className = "critical";
+        } else if (remaining <= 20000) {
+          alerts.textContent = "⚠️ 20 seconds";
+          alerts.className = "warning";
+        } else if (remaining <= 30000) {
+          alerts.textContent = "⚠️ 30 seconds";
+          alerts.className = "warning";
+        }
+      }, 50);
+    }
+
+    function stopCountdown() {
+      clearInterval(countdownInterval);
+      document.getElementById("display").textContent = "--:--:---";
+      document.getElementById("alerts").textContent = "";
+      document.getElementById("alerts").className = "";
+    }
+  </script>
+</body>
+</html>
