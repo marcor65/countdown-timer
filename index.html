@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Countdown Timer</title>
   <style>
     body {
@@ -25,10 +25,23 @@
       padding: 0.5rem 1rem;
       font-size: 1.2rem;
       margin: 0.5rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #startButton {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+    }
+    #stopButton {
+      margin-top: 3rem; /* Più in basso per evitare tocchi accidentali */
+      background-color: #dc3545;
+      color: white;
     }
     #alerts {
-      font-size: 1.5rem;
-      margin-top: 1rem;
+      font-size: 2rem;
+      margin-top: 1.5rem;
     }
   </style>
 </head>
@@ -39,10 +52,11 @@
   <input type="text" id="referenceTime" value="01:20:000" /><br /><br />
 
   <div id="display">--:--:---</div>
-  <button onclick="startCountdown()">START</button>
-  <button onclick="stopCountdown()">STOP / RESET</button>
+  <button id="startButton" onclick="startCountdown()">START</button>
 
   <div id="alerts"></div>
+
+  <button id="stopButton" onclick="stopCountdown()">STOP / RESET</button>
 
   <script>
     let countdownInterval;
@@ -66,43 +80,7 @@
       endTime = Date.now() + duration;
       clearInterval(countdownInterval);
 
-      countdownInterval = setInterval(() => {
-        const remaining = endTime - Date.now();
-        const display = document.getElementById("display");
-        const alerts = document.getElementById("alerts");
-
-        if (remaining <= 0) {
-          display.textContent = "00:00:000";
-          alerts.textContent = "🚀 GO!";
-          alerts.className = "critical";
-          clearInterval(countdownInterval);
-          return;
-        }
-
-        display.textContent = formatTime(remaining);
-        alerts.textContent = "";
-        alerts.className = "";
-
-        if (remaining <= 10000) {
-          const sec = Math.ceil(remaining / 1000);
-          alerts.textContent = sec;
-          alerts.className = "critical";
-        } else if (remaining <= 20000) {
-          alerts.textContent = "⚠️ 20 seconds";
-          alerts.className = "warning";
-        } else if (remaining <= 30000) {
-          alerts.textContent = "⚠️ 30 seconds";
-          alerts.className = "warning";
-        }
-      }, 50);
-    }
-
-    function stopCountdown() {
-      clearInterval(countdownInterval);
-      document.getElementById("display").textContent = "--:--:---";
-      document.getElementById("alerts").textContent = "";
-      document.getElementById("alerts").className = "";
-    }
-  </script>
-</body>
-</html>
+      // Cambia colore bottone START a bianco
+      const startButton = document.getElementById("startButton");
+      startButton.style.backgroundColor = "#ffffff";
+      startButton.style.color = "#000000";
