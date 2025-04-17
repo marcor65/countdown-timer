@@ -12,12 +12,12 @@
       background-color: #f5f5f5;
     }
     #display {
-      font-size: 5rem; /* Aumentato il font per il countdown */
+      font-size: 6rem; /* Aumentato il font per il countdown */
       margin: 1rem 0;
     }
     #referenceTime {
       font-size: 2rem; /* Aumentato il font per l'input */
-      width: 200px;
+      width: 250px; /* Ingrandito il campo di input */
       text-align: center;
     }
     .warning {
@@ -57,7 +57,10 @@
   <input type="text" id="referenceTime" value="120123" /><br />
   <button id="setButton" onclick="setTime()">SET</button><br /><br />
 
-  <div id="display">--:--:---</div>
+  <!-- Visualizzazione del Reference Time una volta confermato -->
+  <div id="referenceTimeDisplay" style="font-size: 3rem; margin-top: 1rem;"></div>
+
+  <div id="display">--:--.---</div>
   <button id="startButton" onclick="startCountdown()">START</button>
 
   <div id="alerts"></div>
@@ -68,6 +71,7 @@
     let countdownInterval;
     let endTime;
     let referenceTimeSet = false;
+    let referenceTimeDuration;
 
     function parseTime(input) {
       // Assicurati che l'input sia lungo almeno 6 caratteri per evitare errori
@@ -92,7 +96,7 @@
       const min = Math.floor(ms / 60000);
       const sec = Math.floor((ms % 60000) / 1000);
       const milli = ms % 1000;
-      return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(milli).padStart(3, '0')}`;
+      return `${String(min).padStart(1, '0')}:${String(sec).padStart(2, '0')}.${String(milli).padStart(3, '0')}`;
     }
 
     function setTime() {
@@ -104,6 +108,12 @@
       }
 
       referenceTimeSet = true;
+      referenceTimeDuration = duration;
+
+      // Visualizza il Reference Time confermato
+      const formattedTime = formatTime(duration);
+      document.getElementById("referenceTimeDisplay").textContent = "Set Time: " + formattedTime;
+
       alert("Reference time set successfully!");
     }
 
@@ -113,10 +123,7 @@
         return;
       }
 
-      const ref = document.getElementById("referenceTime").value;
-      const duration = parseTime(ref);
-
-      endTime = Date.now() + duration;
+      endTime = Date.now() + referenceTimeDuration;
       clearInterval(countdownInterval);
 
       const startButton = document.getElementById("startButton");
