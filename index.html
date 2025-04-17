@@ -34,17 +34,16 @@
 
     #display {
       font-size: 6rem;
-      margin: 2rem 0 1rem 0;
+      margin: 2rem auto 1rem auto;
       font-family: Arial, sans-serif;
-      min-width: 13ch;
-      display: inline-block;
+      width: 16em;
+      display: block;
     }
 
     #alerts {
       font-size: 2rem;
       min-height: 2.5rem;
       margin-top: 1rem;
-      transition: opacity 0.3s ease;
     }
 
     .warning {
@@ -81,15 +80,20 @@
 
   <h2>Countdown Timer</h2>
 
+  <!-- Input Reference Time + SET Button -->
   <input type="text" id="referenceTime" value="120000" />
   <button id="setButton" onclick="setTime()">SET</button>
 
+  <!-- Countdown Display -->
   <div id="display">--:--.---</div>
 
+  <!-- START Button -->
   <button id="startButton" onclick="startCountdown()">START</button>
 
+  <!-- ALERTS subito sotto START -->
   <div id="alerts"></div>
 
+  <!-- STOP Button ben distanziato -->
   <button id="stopButton" onclick="stopCountdown()">STOP / RESET</button>
 
   <script>
@@ -156,11 +160,8 @@
         }
 
         display.textContent = formatTime(remaining);
-
-        if (typeof lastAlert === "number" && lastAlert >= 1 && lastAlert <= 10) {
-          alerts.textContent = "";
-          alerts.className = "";
-        }
+        alerts.textContent = "";
+        alerts.className = "";
 
         const rSec = Math.ceil(remaining / 1000);
 
@@ -175,11 +176,8 @@
           alerts.className = "warning";
           lastAlert = "-20";
           setTimeout(() => {
-            if (lastAlert === "-20") {
-              alerts.textContent = "";
-              alerts.className = "";
-            }
-          }, 3000);
+            if (alerts.textContent === "⚠️ -20 seconds") alerts.textContent = "";
+          }, 2000);
         }
 
         else if (rSec === 30 && lastAlert !== "-30") {
@@ -187,13 +185,9 @@
           alerts.className = "warning";
           lastAlert = "-30";
           setTimeout(() => {
-            if (lastAlert === "-30") {
-              alerts.textContent = "";
-              alerts.className = "";
-            }
-          }, 3000);
+            if (alerts.textContent === "⚠️ -30 seconds") alerts.textContent = "";
+          }, 2000);
         }
-
       }, 50);
     }
 
