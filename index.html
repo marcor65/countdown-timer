@@ -44,7 +44,6 @@
     button#stop {
       background-color: red;
       color: white;
-      margin-top: 30px; /* Aumentato per spostare il pulsante STOP più in basso */
     }
   </style>
 </head>
@@ -81,19 +80,18 @@
       return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}:${String(milli).padStart(3, '0')}`;
     }
 
-    function showAlert(message, cssClass) {
+    function showAlert(message, cssClass, duration = 2000) {
       const alerts = document.getElementById("alerts");
       clearTimeout(alertTimeout);
       alerts.textContent = message;
       alerts.className = cssClass;
 
       alertTimeout = setTimeout(() => {
-        // Solo cancella se l'alert non è stato già sovrascritto da uno nuovo
         if (alerts.textContent === message) {
           alerts.textContent = "";
           alerts.className = "";
         }
-      }, 2000); // 2 secondi di visibilità
+      }, duration);  // Durata dell'alert (2 secondi per -30 e -20, altrimenti indeterminato)
     }
 
     function startCountdown() {
@@ -108,7 +106,7 @@
 
         if (remaining <= 0) {
           display.textContent = "00:00:000";
-          showAlert("🚀 GO!", "critical");
+          showAlert("🚀 GO!", "critical", 0); // Mantieni GO! fino alla fine
           clearInterval(countdownInterval);
           return;
         }
@@ -116,14 +114,19 @@
         display.textContent = formatTime(remaining);
         
         const rSec = Math.ceil(remaining / 1000);
+
+        // Mostra i numeri da 10 a 1, mantenendo il messaggio fino al successivo
         if (rSec <= 10 && rSec > 0) {
-          showAlert(rSec, "critical");
+          if (lastAlert !== rSec) {
+            showAlert(rSec, "critical", 0);  // Durata indefinita finché non cambia il numero
+            lastAlert = rSec;
+          }
         } else if (rSec === 0) {
-          showAlert("🚀 GO!", "critical");
+          showAlert("🚀 GO!", "critical", 0);
         } else if (rSec === 20) {
-          showAlert("⚠️ -20 seconds", "warning");
+          showAlert("⚠️ -20 seconds", "warning", 2000);  // 2 secondi per -20
         } else if (rSec === 30) {
-          showAlert("⚠️ -30 seconds", "warning");
+          showAlert("⚠️ -30 seconds", "warning", 2000);  // 2 secondi per -30
         }
       }, 50);
     }
@@ -133,6 +136,7 @@
       document.getElementById("display").textContent = "--:--:---";
       document.getElementById("alerts").textContent = "";
       document.getElementById("alerts").className = "";
+      lastAlert = ""; // Reset della variabile di controllo per gli alert
     }
 
     function setReferenceTime() {
