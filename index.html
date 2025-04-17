@@ -22,7 +22,7 @@
       color: red;
     }
     button {
-      padding: 0.5rem 1rem;
+      padding: 0.5rem 1.5rem;
       font-size: 1.2rem;
       margin: 0.5rem;
       border: none;
@@ -35,7 +35,7 @@
       font-weight: bold;
     }
     #stopButton {
-      margin-top: 3rem; /* Più in basso per evitare tocchi accidentali */
+      margin-top: 3rem; /* Spostato più in basso */
       background-color: #dc3545;
       color: white;
     }
@@ -63,7 +63,10 @@
     let endTime;
 
     function parseTime(input) {
-      const [min, sec, ms] = input.split(":").map(Number);
+      const parts = input.split(":");
+      if (parts.length !== 3) return NaN;
+      const [min, sec, ms] = parts.map(Number);
+      if (isNaN(min) || isNaN(sec) || isNaN(ms)) return NaN;
       return (min * 60 * 1000) + (sec * 1000) + ms;
     }
 
@@ -77,10 +80,64 @@
     function startCountdown() {
       const ref = document.getElementById("referenceTime").value;
       const duration = parseTime(ref);
+
+      if (isNaN(duration) || duration <= 0) {
+        alert("Please enter a valid time in the format mm:ss:ms");
+        return;
+      }
+
       endTime = Date.now() + duration;
       clearInterval(countdownInterval);
 
-      // Cambia colore bottone START a bianco
       const startButton = document.getElementById("startButton");
       startButton.style.backgroundColor = "#ffffff";
       startButton.style.color = "#000000";
+
+      countdownInterval = setInterval(() => {
+        const remaining = endTime - Date.now();
+        const display = document.getElementById("display");
+        const alerts = document.getElementById("alerts");
+
+        if (remaining <= 0) {
+          display.textContent = "00:00:000";
+          alerts.textContent = "🚀 GO!";
+          alerts.className = "critical";
+          clearInterval(countdownInterval);
+
+          // Reset START button
+          startButton.style.backgroundColor = "#28a745";
+          startButton.style.color = "#ffffff";
+          return;
+        }
+
+        display.textContent = formatTime(remaining);
+        alerts.textContent = "";
+        alerts.className = "";
+
+        if (remaining <= 10000) {
+          const sec = Math.ceil(remaining / 1000);
+          alerts.textContent = sec;
+          alerts.className = "critical";
+        } else if (remaining <= 20000) {
+          alerts.textContent = "⚠️ 20 seconds";
+          alerts.className = "warning";
+        } else if (remaining <= 30000) {
+          alerts.textContent = "⚠️ 30 seconds";
+          alerts.className = "warning";
+        }
+      }, 50);
+    }
+
+    function stopCountdown() {
+      clearInterval(countdownInterval);
+      document.getElementById("display").textContent = "--:--:---";
+      document.getElementById("alerts").textContent = "";
+      document.getElementById("alerts").className = "";
+
+      const startButton = document.getElementById("startButton");
+      startButton.style.backgroundColor = "#28a745";
+      startButton.style.color = "#ffffff";
+    }
+  </script>
+</body>
+</html>
