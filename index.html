@@ -37,6 +37,7 @@
       margin: 2rem auto 1rem auto;
       display: inline-block;
       min-width: 450px;
+      text-align: center;
     }
 
     #alerts {
@@ -178,7 +179,7 @@
           lastAlert = "-20";
           setTimeout(() => {
             if (alerts.textContent === "⚠️ -20 seconds") alerts.textContent = "";
-          }, 4000);
+          }, 5000);  <!-- Aumentato il tempo a 5 secondi -->
         }
 
         else if (rSec === 30 && lastAlert !== "-30") {
@@ -187,7 +188,7 @@
           lastAlert = "-30";
           setTimeout(() => {
             if (alerts.textContent === "⚠️ -30 seconds") alerts.textContent = "";
-          }, 4000);
+          }, 5000);  <!-- Aumentato il tempo a 5 secondi -->
         }
       }, 50);
     }
