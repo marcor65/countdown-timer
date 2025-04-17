@@ -10,6 +10,11 @@
       text-align: center;
       padding: 2rem;
       background-color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
     input, #setButton {
@@ -103,6 +108,7 @@
     let endTime;
     let originalDuration = 0;
     let lastAlert = null;
+    let alertVisible = false;
 
     function setTime() {
       const input = document.getElementById("referenceTime").value.trim();
@@ -171,26 +177,33 @@
           alerts.textContent = rSec;
           alerts.className = "critical";
           lastAlert = rSec;
+          showAlertForDuration();
         }
 
         else if (rSec === 20 && lastAlert !== "-20") {
           alerts.textContent = "⚠️ -20 seconds";
           alerts.className = "warning";
           lastAlert = "-20";
-          setTimeout(() => {
-            if (alerts.textContent === "⚠️ -20 seconds") alerts.textContent = "";
-          }, 3000);  <!-- Aumentato il tempo a 3 secondi -->
+          showAlertForDuration();
         }
 
         else if (rSec === 30 && lastAlert !== "-30") {
           alerts.textContent = "⚠️ -30 seconds";
           alerts.className = "warning";
           lastAlert = "-30";
-          setTimeout(() => {
-            if (alerts.textContent === "⚠️ -30 seconds") alerts.textContent = "";
-          }, 3000);  <!-- Aumentato il tempo a 3 secondi -->
+          showAlertForDuration();
         }
       }, 50);
+    }
+
+    function showAlertForDuration() {
+      if (alertVisible) return;
+      alertVisible = true;
+      setTimeout(() => {
+        document.getElementById("alerts").textContent = "";
+        document.getElementById("alerts").className = "";
+        alertVisible = false;
+      }, 3000);  // Mantieni l'alert visibile per 3 secondi
     }
 
     function stopCountdown() {
