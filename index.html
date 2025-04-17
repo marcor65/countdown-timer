@@ -12,7 +12,7 @@
       background-color: #f5f5f5;
     }
     #display {
-      font-size: 6rem; /* Font del countdown */
+      font-size: 5rem; /* Font del countdown */
       margin: 1rem 0;
     }
     .warning {
@@ -80,19 +80,19 @@
       return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}:${String(milli).padStart(3, '0')}`;
     }
 
-    function showAlert(message, cssClass) {
+    function showAlert(message, cssClass, duration = 2000) {
       const alerts = document.getElementById("alerts");
+
       clearTimeout(alertTimeout);
       alerts.textContent = message;
       alerts.className = cssClass;
 
       alertTimeout = setTimeout(() => {
-        // Solo cancella se l'alert non è stato già sovrascritto da uno nuovo
         if (alerts.textContent === message) {
           alerts.textContent = "";
           alerts.className = "";
         }
-      }, 2000);
+      }, duration);
     }
 
     function startCountdown() {
@@ -107,7 +107,7 @@
 
         if (remaining <= 0) {
           display.textContent = "00:00:000";
-          showAlert("🚀 GO!", "critical");
+          showAlert("🚀 GO!", "critical", 2000);
           clearInterval(countdownInterval);
           return;
         }
@@ -116,13 +116,16 @@
         
         const rSec = Math.ceil(remaining / 1000);
         if (rSec <= 10 && rSec > 0) {
-          showAlert(rSec, "critical");
+          if (lastAlert !== rSec) {
+            showAlert(rSec, "critical", 2000); // Rimane per 2 secondi
+            lastAlert = rSec;
+          }
         } else if (rSec === 0) {
-          showAlert("🚀 GO!", "critical");
+          showAlert("🚀 GO!", "critical", 2000);
         } else if (rSec === 20) {
-          showAlert("⚠️ -20 seconds", "warning");
+          showAlert("⚠️ -20 seconds", "warning", 2000);
         } else if (rSec === 30) {
-          showAlert("⚠️ -30 seconds", "warning");
+          showAlert("⚠️ -30 seconds", "warning", 2000);
         }
       }, 50);
     }
