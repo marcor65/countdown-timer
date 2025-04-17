@@ -40,13 +40,17 @@
       font-weight: bold;
     }
     #stopButton {
-      margin-top: 6rem; /* Aumentata la distanza */
+      margin-top: 8rem; /* Spostato più in basso */
       background-color: #dc3545;
       color: white;
     }
     #alerts {
       font-size: 3rem; /* Aumentato il font per gli alert */
       margin-top: 1.5rem;
+    }
+    #referenceTimeDisplay {
+      font-size: 3rem;
+      margin-top: 1rem;
     }
   </style>
 </head>
@@ -74,7 +78,6 @@
     let referenceTimeDuration;
 
     function parseTime(input) {
-      // Assicurati che l'input sia lungo almeno 6 caratteri per evitare errori
       if (input.length < 6) {
         alert("Please enter a valid time in the format msssss (minssms).");
         return NaN;
@@ -110,7 +113,7 @@
       referenceTimeSet = true;
       referenceTimeDuration = duration;
 
-      // Visualizza il Reference Time confermato
+      // Visualizza il Reference Time confermato nel formato corretto
       const formattedTime = formatTime(duration);
       document.getElementById("referenceTimeDisplay").textContent = "Set Time: " + formattedTime;
 
@@ -164,6 +167,16 @@
           alerts.textContent = "⚠️ 30 seconds";
           alerts.className = "warning";
           setTimeout(() => alerts.textContent = "", 2000); // Mostra per 2 secondi
+        }
+        
+        // Countdown da 10 a GO
+        if (remaining <= 10000 && remaining > 0) {
+          const sec = Math.floor(remaining / 1000);
+          if (sec >= 1 && sec <= 10) {
+            alerts.textContent = sec;
+            alerts.className = "critical";
+            setTimeout(() => alerts.textContent = "", 2000); // Mostra per 2 secondi
+          }
         }
       }, 50);
     }
