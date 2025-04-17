@@ -35,14 +35,16 @@
     #display {
       font-size: 6rem;
       margin: 2rem auto 1rem auto;
-      width: 450px; /* aggiunta per evitare disallineamento */
-      text-align: center;
+      display: inline-block;
+      min-width: 450px;
     }
 
     #alerts {
       font-size: 2rem;
       min-height: 2.5rem;
       margin-top: 1rem;
+      height: 2.5rem;
+      transition: opacity 0.5s;
     }
 
     .warning {
@@ -176,7 +178,7 @@
           lastAlert = "-20";
           setTimeout(() => {
             if (alerts.textContent === "⚠️ -20 seconds") alerts.textContent = "";
-          }, 2000);
+          }, 4000);
         }
 
         else if (rSec === 30 && lastAlert !== "-30") {
@@ -185,7 +187,7 @@
           lastAlert = "-30";
           setTimeout(() => {
             if (alerts.textContent === "⚠️ -30 seconds") alerts.textContent = "";
-          }, 2000);
+          }, 4000);
         }
       }, 50);
     }
