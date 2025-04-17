@@ -35,7 +35,7 @@
       font-weight: bold;
     }
     #stopButton {
-      margin-top: 3rem; /* Più in basso */
+      margin-top: 6rem; /* Aumentata la distanza */
       background-color: #dc3545;
       color: white;
     }
@@ -49,7 +49,7 @@
   <h2>Countdown Timer</h2>
 
   <label for="referenceTime">Set Reference Time (m:ss.mmm):</label><br />
-  <input type="text" id="referenceTime" value="1:20.000" /><br /><br />
+  <input type="text" id="referenceTime" value="120123" /><br /><br />
 
   <div id="display">--:--:---</div>
   <button id="startButton" onclick="startCountdown()">START</button>
@@ -63,7 +63,7 @@
     let endTime;
 
     function parseTime(input) {
-      const regex = /^(\d{1,2}):(\d{2})\.(\d{3})$/;
+      const regex = /^(\d{1,2})(\d{2})(\d{3})$/; // Nuovo formato senza separatori
       const match = input.match(regex);
       if (!match) return NaN; // Ritorna NaN se non è nel formato corretto
       const [_, min, sec, ms] = match.map(Number);
@@ -118,12 +118,15 @@
           const sec = Math.ceil(remaining / 1000);
           alerts.textContent = sec;
           alerts.className = "critical";
+          setTimeout(() => alerts.textContent = "", 2000); // Mostra per 2 secondi
         } else if (remaining <= 20000) {
           alerts.textContent = "⚠️ 20 seconds";
           alerts.className = "warning";
+          setTimeout(() => alerts.textContent = "", 2000); // Mostra per 2 secondi
         } else if (remaining <= 30000) {
           alerts.textContent = "⚠️ 30 seconds";
           alerts.className = "warning";
+          setTimeout(() => alerts.textContent = "", 2000); // Mostra per 2 secondi
         }
       }, 50);
     }
