@@ -17,7 +17,7 @@
       text-align: center;
     }
     #display {
-      font-size: 5rem;
+      font-size: 4rem;
       margin: 1rem 0;
     }
     .warning {
@@ -40,7 +40,7 @@
       color: white;
     }
     #stopButton {
-      margin-top: 10rem;
+      margin-top: 15rem;
     }
     #setButton {
       background-color: black;
@@ -73,18 +73,20 @@
     let endTime;
     let formattedTime = 0;
     let alertTimeout;
+    let finalCountdownActive = false;
     const startBtn = document.getElementById("startButton");
 
     function formatReferenceTime() {
-      const input = document.getElementById("referenceTime").value;
-      if (!/^\d{6}$/.test(input)) {
+      const input = document.getElementById("referenceTime");
+      const raw = input.value.replace(/\D/g, ''); // Rimuove qualsiasi separatore
+      if (!/^\d{6}$/.test(raw)) {
         alert("Inserire 6 cifre esatte nel formato mssmmm (es: 120000)");
         return;
       }
 
-      const m = parseInt(input.slice(0, 1), 10);
-      const ss = parseInt(input.slice(1, 3), 10);
-      const mmm = parseInt(input.slice(3, 6), 10);
+      const m = parseInt(raw.slice(0, 1), 10);
+      const ss = parseInt(raw.slice(1, 3), 10);
+      const mmm = parseInt(raw.slice(3, 6), 10);
 
       if (ss > 59 || mmm > 999) {
         alert("Secondi max 59, millisecondi max 999");
@@ -92,8 +94,7 @@
       }
 
       formattedTime = (m * 60 * 1000) + (ss * 1000) + mmm;
-      const formattedStr = `${m}:${String(ss).padStart(2, '0')}.${String(mmm).padStart(3, '0')}`;
-      document.getElementById("referenceTime").value = formattedStr;
+      input.value = `${m}:${String(ss).padStart(2, '0')}.${String(mmm).padStart(3, '0')}`;
     }
 
     function formatTime(ms) {
@@ -107,8 +108,8 @@
       const alerts = document.getElementById("alerts");
       alerts.textContent = msg;
       alerts.className = className;
-
       clearTimeout(alertTimeout);
+
       if (duration > 0) {
         alertTimeout = setTimeout(() => {
           alerts.textContent = '';
@@ -127,9 +128,11 @@
       clearInterval(countdownInterval);
       startBtn.style.backgroundColor = "white";
       startBtn.style.color = "black";
+      finalCountdownActive = false;
 
       countdownInterval = setInterval(() => {
-        const remaining = endTime - Date.now();
+        const now = Date.now();
+        const remaining = endTime - now;
         const display = document.getElementById("display");
 
         if (remaining <= 0) {
@@ -143,12 +146,17 @@
 
         display.textContent = formatTime(remaining);
 
-        if (remaining <= 10000) {
-          const sec = Math.ceil(remaining / 1000);
-          showAlert(sec.toString(), "critical", 1000);
-        } else if (remaining <= 20000 && remaining > 19000) {
+        const secRemaining = Math.ceil(remaining / 1000);
+
+        if (secRemaining <= 10 && !finalCountdownActive) {
+          finalCountdownActive = true;
+        }
+
+        if (finalCountdownActive && secRemaining <= 10 && secRemaining > 0) {
+          showAlert(secRemaining.toString(), "critical", 1000);
+        } else if (secRemaining === 20) {
           showAlert("⚠️ 20 seconds", "warning", 2000);
-        } else if (remaining <= 30000 && remaining > 29000) {
+        } else if (secRemaining === 30) {
           showAlert("⚠️ 30 seconds", "warning", 2000);
         }
       }, 50);
@@ -161,6 +169,7 @@
       document.getElementById("alerts").className = "";
       startBtn.style.backgroundColor = "#28a745";
       startBtn.style.color = "white";
+      finalCountdownActive = false;
     }
   </script>
 </body>
