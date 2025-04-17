@@ -35,7 +35,7 @@
       font-weight: bold;
     }
     #stopButton {
-      margin-top: 3rem; /* Spostato più in basso */
+      margin-top: 3rem; /* Più in basso */
       background-color: #dc3545;
       color: white;
     }
@@ -48,8 +48,8 @@
 <body>
   <h2>Countdown Timer</h2>
 
-  <label for="referenceTime">Set Reference Time (mm:ss:ms):</label><br />
-  <input type="text" id="referenceTime" value="01:20:000" /><br /><br />
+  <label for="referenceTime">Set Reference Time (m:ss.mmm):</label><br />
+  <input type="text" id="referenceTime" value="1:20.000" /><br /><br />
 
   <div id="display">--:--:---</div>
   <button id="startButton" onclick="startCountdown()">START</button>
@@ -63,10 +63,10 @@
     let endTime;
 
     function parseTime(input) {
-      const parts = input.split(":");
-      if (parts.length !== 3) return NaN;
-      const [min, sec, ms] = parts.map(Number);
-      if (isNaN(min) || isNaN(sec) || isNaN(ms)) return NaN;
+      const regex = /^(\d{1,2}):(\d{2})\.(\d{3})$/;
+      const match = input.match(regex);
+      if (!match) return NaN; // Ritorna NaN se non è nel formato corretto
+      const [_, min, sec, ms] = match.map(Number);
       return (min * 60 * 1000) + (sec * 1000) + ms;
     }
 
@@ -74,7 +74,7 @@
       const min = Math.floor(ms / 60000);
       const sec = Math.floor((ms % 60000) / 1000);
       const milli = ms % 1000;
-      return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}:${String(milli).padStart(3, '0')}`;
+      return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(milli).padStart(3, '0')}`;
     }
 
     function startCountdown() {
@@ -82,7 +82,7 @@
       const duration = parseTime(ref);
 
       if (isNaN(duration) || duration <= 0) {
-        alert("Please enter a valid time in the format mm:ss:ms");
+        alert("Please enter a valid time in the format m:ss.mmm");
         return;
       }
 
@@ -99,7 +99,7 @@
         const alerts = document.getElementById("alerts");
 
         if (remaining <= 0) {
-          display.textContent = "00:00:000";
+          display.textContent = "00:00.000";
           alerts.textContent = "🚀 GO!";
           alerts.className = "critical";
           clearInterval(countdownInterval);
@@ -130,7 +130,7 @@
 
     function stopCountdown() {
       clearInterval(countdownInterval);
-      document.getElementById("display").textContent = "--:--:---";
+      document.getElementById("display").textContent = "--:--.---";
       document.getElementById("alerts").textContent = "";
       document.getElementById("alerts").className = "";
 
