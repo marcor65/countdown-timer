@@ -35,8 +35,8 @@
     #display {
       font-size: 6rem;
       margin: 2rem 0 1rem 0;
-      font-family: 'Arial', monospace;
-      width: 15ch;
+      font-family: Arial, sans-serif;
+      min-width: 13ch;
       display: inline-block;
     }
 
@@ -81,20 +81,15 @@
 
   <h2>Countdown Timer</h2>
 
-  <!-- Input Reference Time + SET Button -->
   <input type="text" id="referenceTime" value="120000" />
   <button id="setButton" onclick="setTime()">SET</button>
 
-  <!-- Countdown Display -->
   <div id="display">--:--.---</div>
 
-  <!-- START Button -->
   <button id="startButton" onclick="startCountdown()">START</button>
 
-  <!-- ALERTS subito sotto START -->
   <div id="alerts"></div>
 
-  <!-- STOP Button ben distanziato -->
   <button id="stopButton" onclick="stopCountdown()">STOP / RESET</button>
 
   <script>
@@ -162,7 +157,6 @@
 
         display.textContent = formatTime(remaining);
 
-        // Solo cancella se l’ultimo alert era numerico da 1 a 10
         if (typeof lastAlert === "number" && lastAlert >= 1 && lastAlert <= 10) {
           alerts.textContent = "";
           alerts.className = "";
