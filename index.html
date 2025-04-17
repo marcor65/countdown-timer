@@ -1,8 +1,8 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Countdown Timer</title>
   <style>
     body {
@@ -11,134 +11,172 @@
       padding: 2rem;
       background-color: #f5f5f5;
     }
-    #display {
-      font-size: 3rem; /* Font del countdown */
-      margin: 1rem 0;
+
+    input, #setButton {
+      font-size: 1.5rem;
+      padding: 0.4rem 0.6rem;
     }
+
+    #referenceTime {
+      width: 120px;
+      text-align: center;
+      margin-right: 1rem;
+    }
+
+    #setButton {
+      background-color: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #display {
+      font-size: 3rem;
+      margin: 2rem 0 1rem 0;
+    }
+
+    #alerts {
+      font-size: 2rem;
+      margin-top: 1rem;
+      min-height: 2.5rem;
+    }
+
     .warning {
       color: orange;
     }
+
     .critical {
       color: red;
     }
+
     button {
-      padding: 0.5rem 1rem;
-      font-size: 1.2rem;
-      margin: 0.5rem;
+      padding: 0.6rem 1.4rem;
+      font-size: 1.4rem;
+      margin: 1rem;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
     }
-    #alerts {
-      font-size: 2rem; /* Font per gli alert */
-      margin-top: 1rem;
-    }
-    #referenceTime {
-      font-size: 2rem;
-      width: 200px;
-    }
-    button#set {
-      background-color: black;
+
+    #startButton {
+      background-color: green;
       color: white;
-      font-size: 1.2rem;
-      padding: 0.5rem 1rem;
-      margin-left: 10px;
     }
-    button#stop {
+
+    #stopButton {
       background-color: red;
       color: white;
+      margin-top: 6rem;
     }
   </style>
 </head>
 <body>
   <h2>Countdown Timer</h2>
 
-  <label for="referenceTime">Set Reference Time (mmsssss):</label><br />
-  <input type="text" id="referenceTime" value="0120000" />
-  <button id="set" onclick="setReferenceTime()">SET</button><br /><br />
+  <input type="text" id="referenceTime" value="120000" />
+  <button id="setButton" onclick="formatReferenceTime()">SET</button><br />
 
-  <div id="display">--:--:---</div>
-  <button onclick="startCountdown()">START</button>
-  <button id="stop" onclick="stopCountdown()">STOP / RESET</button>
+  <div id="display">--:--.---</div>
 
+  <button id="startButton" onclick="startCountdown()">START</button>
+
+  <!-- ALERT sotto START -->
   <div id="alerts"></div>
+
+  <button id="stopButton" onclick="stopCountdown()">STOP / RESET</button>
 
   <script>
     let countdownInterval;
     let endTime;
-    let alertTimeout;
-    let lastAlert = "";
+    let originalDuration = 0;
 
-    function parseTime(input) {
-      const min = parseInt(input.slice(0, 1));
-      const sec = parseInt(input.slice(1, 3));
-      const ms = parseInt(input.slice(3, 6));
-      return (min * 60 * 1000) + (sec * 1000) + ms;
+    function formatReferenceTime() {
+      const input = document.getElementById("referenceTime").value;
+      const padded = input.padStart(6, '0');
+      const min = parseInt(padded[0]);
+      const sec = parseInt(padded.slice(1, 3));
+      const ms = parseInt(padded.slice(3, 6));
+
+      if (isNaN(min) || isNaN(sec) || isNaN(ms)) {
+        alert("Inserisci un tempo valido (es. 120000 per 1:20.000)");
+        return;
+      }
+
+      originalDuration = (min * 60 * 1000) + (sec * 1000) + ms;
+      document.getElementById("referenceTime").value = `${min}:${String(sec).padStart(2, '0')}.${String(ms).padStart(3, '0')}`;
     }
 
     function formatTime(ms) {
       const min = Math.floor(ms / 60000);
       const sec = Math.floor((ms % 60000) / 1000);
       const milli = ms % 1000;
-      return ${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}:${String(milli).padStart(3, '0')};
-    }
-
-    function showAlert(message, cssClass) {
-      const alerts = document.getElementById("alerts");
-      clearTimeout(alertTimeout);
-      alerts.textContent = message;
-      alerts.className = cssClass;
-
-      alertTimeout = setTimeout(() => {
-        // Solo cancella se l'alert non è stato già sovrascritto da uno nuovo
-        if (alerts.textContent === message) {
-          alerts.textContent = "";
-          alerts.className = "";
-        }
-      }, 2000);
+      return `${min}:${String(sec).padStart(2, '0')}.${String(milli).padStart(3, '0')}`;
     }
 
     function startCountdown() {
-      const ref = document.getElementById("referenceTime").value;
-      const duration = parseTime(ref);
-      endTime = Date.now() + duration;
+      if (originalDuration <= 0) {
+        alert("Premi SET per confermare il tempo.");
+        return;
+      }
+
+      endTime = Date.now() + originalDuration;
       clearInterval(countdownInterval);
+      document.getElementById("startButton").style.backgroundColor = "white";
+      document.getElementById("startButton").style.color = "black";
 
       countdownInterval = setInterval(() => {
         const remaining = endTime - Date.now();
         const display = document.getElementById("display");
+        const alerts = document.getElementById("alerts");
 
         if (remaining <= 0) {
-          display.textContent = "00:00:000";
-          showAlert("🚀 GO!", "critical");
+          display.textContent = "00:00.000";
+          alerts.textContent = "🚀 GO!";
+          alerts.className = "critical";
           clearInterval(countdownInterval);
+
+          setTimeout(() => {
+            document.getElementById("startButton").style.backgroundColor = "green";
+            document.getElementById("startButton").style.color = "white";
+          }, 1000);
+
           return;
         }
 
         display.textContent = formatTime(remaining);
-        
-        const rSec = Math.ceil(remaining / 1000);
-        if (rSec <= 10 && rSec > 0) {
-          showAlert(rSec, "critical");
-        } else if (rSec === 0) {
-          showAlert("🚀 GO!", "critical");
-        } else if (rSec === 20) {
-          showAlert("⚠️ -20 seconds", "warning");
-        } else if (rSec === 30) {
-          showAlert("⚠️ -30 seconds", "warning");
+        alerts.textContent = "";
+        alerts.className = "";
+
+        // Alerts countdown from 10 to 1
+        if (remaining <= 10000) {
+          const sec = Math.ceil(remaining / 1000);
+          alerts.textContent = sec;
+          alerts.className = "critical";
+        }
+
+        // -20 alert (show only for 2 seconds)
+        else if (remaining <= 20000 && remaining > 18000) {
+          alerts.textContent = "⚠️ -20 seconds";
+          alerts.className = "warning";
+        }
+
+        // -30 alert (show only for 2 seconds)
+        else if (remaining <= 30000 && remaining > 28000) {
+          alerts.textContent = "⚠️ -30 seconds";
+          alerts.className = "warning";
         }
       }, 50);
     }
 
     function stopCountdown() {
       clearInterval(countdownInterval);
-      document.getElementById("display").textContent = "--:--:---";
+      document.getElementById("display").textContent = "--:--.---";
       document.getElementById("alerts").textContent = "";
       document.getElementById("alerts").className = "";
-    }
 
-    function setReferenceTime() {
-      const ref = document.getElementById("referenceTime").value;
-      if (/^\d{7}$/.test(ref)) {
-        document.getElementById("referenceTime").value = ${ref.slice(0, 1)}:${ref.slice(1, 3)}.${ref.slice(3, 6)};
-      }
+      document.getElementById("startButton").style.backgroundColor = "green";
+      document.getElementById("startButton").style.color = "white";
     }
   </script>
 </body>
