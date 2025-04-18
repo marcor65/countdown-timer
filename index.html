@@ -87,15 +87,20 @@
 
   <h2>Countdown Timer</h2>
 
+  <!-- Input Reference Time + SET Button -->
   <input type="text" id="referenceTime" value="120000" />
   <button id="setButton" onclick="setTime()">SET</button>
 
+  <!-- Countdown Display -->
   <div id="display">--:--.---</div>
 
+  <!-- START Button -->
   <button id="startButton" onclick="startCountdown()">START</button>
 
+  <!-- ALERTS -->
   <div id="alerts"></div>
 
+  <!-- STOP Button -->
   <button id="stopButton" onclick="stopCountdown()">STOP / RESET</button>
 
   <script>
@@ -103,7 +108,7 @@
     let endTime;
     let originalDuration = 0;
     let lastAlert = null;
-    let alertTimeout = null;
+    let countdownStart = null;
 
     function setTime() {
       const input = document.getElementById("referenceTime").value.trim();
@@ -130,13 +135,24 @@
       return `${min}:${String(sec).padStart(2, '0')}.${String(milli).padStart(3, '0')}`;
     }
 
+    function showAlert(text, className, duration = 1000) {
+      const alerts = document.getElementById("alerts");
+      alerts.textContent = text;
+      alerts.className = className;
+      setTimeout(() => {
+        alerts.textContent = "";
+        alerts.className = "";
+      }, duration);
+    }
+
     function startCountdown() {
       if (originalDuration <= 0) {
         alert("Premi SET per confermare il tempo.");
         return;
       }
 
-      endTime = Date.now() + originalDuration;
+      countdownStart = Date.now();
+      endTime = countdownStart + originalDuration;
       clearInterval(countdownInterval);
       document.getElementById("startButton").style.backgroundColor = "white";
       document.getElementById("startButton").style.color = "black";
@@ -146,54 +162,45 @@
         const now = Date.now();
         const remaining = endTime - now;
         const display = document.getElementById("display");
-        const alerts = document.getElementById("alerts");
 
         if (remaining <= 0) {
           display.textContent = "00:00.000";
-          showAlert("🚀 GO!", "critical", 1000);
+          showAlert("🚀 GO!", "critical", 1500);
           clearInterval(countdownInterval);
+
           setTimeout(() => {
             document.getElementById("startButton").style.backgroundColor = "green";
             document.getElementById("startButton").style.color = "white";
           }, 1000);
+
           return;
         }
 
         display.textContent = formatTime(remaining);
 
-        const rSec = Math.ceil(remaining / 1000);
+        const secondsRemaining = Math.floor(remaining / 1000);
+        const secondsElapsed = Math.floor((originalDuration - remaining) / 1000);
+        const countdownNumber = 10 - secondsElapsed;
 
-        if (rSec <= 10 && rSec >= 1 && lastAlert !== rSec) {
-          showAlert(rSec, "critical", 1000);
-          lastAlert = rSec;
-        } else if (rSec === 20 && lastAlert !== "-20") {
-          showAlert("⚠️ -20 seconds", "warning", 2000);
-          lastAlert = "-20";
-        } else if (rSec === 30 && lastAlert !== "-30") {
-          showAlert("⚠️ -30 seconds", "warning", 2000);
+        if (countdownNumber >= 1 && countdownNumber <= 10 && lastAlert !== countdownNumber) {
+          showAlert(countdownNumber, "critical", 1000);
+          lastAlert = countdownNumber;
+        }
+
+        if (secondsRemaining === 30 && lastAlert !== "-30") {
+          showAlert("⚠️ -30 seconds", "warning", 3000);
           lastAlert = "-30";
+        }
+
+        if (secondsRemaining === 20 && lastAlert !== "-20") {
+          showAlert("⚠️ -20 seconds", "warning", 3000);
+          lastAlert = "-20";
         }
       }, 50);
     }
 
-    function showAlert(message, className, duration) {
-      const alerts = document.getElementById("alerts");
-      alerts.textContent = message;
-      alerts.className = className;
-
-      if (alertTimeout) {
-        clearTimeout(alertTimeout);
-      }
-
-      alertTimeout = setTimeout(() => {
-        alerts.textContent = "";
-        alerts.className = "";
-      }, duration);
-    }
-
     function stopCountdown() {
       clearInterval(countdownInterval);
-      if (alertTimeout) clearTimeout(alertTimeout);
       document.getElementById("display").textContent = "--:--.---";
       document.getElementById("alerts").textContent = "";
       document.getElementById("alerts").className = "";
