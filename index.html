@@ -87,20 +87,15 @@
 
   <h2>Countdown Timer</h2>
 
-  <!-- Input Reference Time + SET Button -->
   <input type="text" id="referenceTime" value="120000" />
   <button id="setButton" onclick="setTime()">SET</button>
 
-  <!-- Countdown Display -->
   <div id="display">--:--.---</div>
 
-  <!-- START Button -->
   <button id="startButton" onclick="startCountdown()">START</button>
 
-  <!-- ALERTS subito sotto START -->
   <div id="alerts"></div>
 
-  <!-- STOP Button ben distanziato -->
   <button id="stopButton" onclick="stopCountdown()">STOP / RESET</button>
 
   <script>
@@ -108,7 +103,7 @@
     let endTime;
     let originalDuration = 0;
     let lastAlert = null;
-    let alertVisible = false;
+    let alertTimeout = null;
 
     function setTime() {
       const input = document.getElementById("referenceTime").value.trim();
@@ -155,15 +150,11 @@
 
         if (remaining <= 0) {
           display.textContent = "00:00.000";
-          alerts.textContent = "🚀 GO!";
-          alerts.className = "critical";
+          showAlert("🚀 GO!", "critical", 1000);
           clearInterval(countdownInterval);
-
           setTimeout(() => {
             document.getElementById("startButton").style.backgroundColor = "green";
             document.getElementById("startButton").style.color = "white";
-            alerts.textContent = "";
-            alerts.className = "";
           }, 1000);
           return;
         }
@@ -172,38 +163,37 @@
 
         const rSec = Math.ceil(remaining / 1000);
 
-        if (!alertVisible) {
-          if (rSec <= 10 && rSec >= 1 && lastAlert !== rSec) {
-            alerts.textContent = rSec;
-            alerts.className = "critical";
-            lastAlert = rSec;
-            showAlertForDuration();
-          } else if (rSec === 20 && lastAlert !== "-20") {
-            alerts.textContent = "⚠️ -20 seconds";
-            alerts.className = "warning";
-            lastAlert = "-20";
-            showAlertForDuration();
-          } else if (rSec === 30 && lastAlert !== "-30") {
-            alerts.textContent = "⚠️ -30 seconds";
-            alerts.className = "warning";
-            lastAlert = "-30";
-            showAlertForDuration();
-          }
+        if (rSec <= 10 && rSec >= 1 && lastAlert !== rSec) {
+          showAlert(rSec, "critical", 1000);
+          lastAlert = rSec;
+        } else if (rSec === 20 && lastAlert !== "-20") {
+          showAlert("⚠️ -20 seconds", "warning", 2000);
+          lastAlert = "-20";
+        } else if (rSec === 30 && lastAlert !== "-30") {
+          showAlert("⚠️ -30 seconds", "warning", 2000);
+          lastAlert = "-30";
         }
       }, 50);
     }
 
-    function showAlertForDuration() {
-      alertVisible = true;
-      setTimeout(() => {
-        document.getElementById("alerts").textContent = "";
-        document.getElementById("alerts").className = "";
-        alertVisible = false;
-      }, 3000);  // Mantieni l'alert visibile per 3 secondi
+    function showAlert(message, className, duration) {
+      const alerts = document.getElementById("alerts");
+      alerts.textContent = message;
+      alerts.className = className;
+
+      if (alertTimeout) {
+        clearTimeout(alertTimeout);
+      }
+
+      alertTimeout = setTimeout(() => {
+        alerts.textContent = "";
+        alerts.className = "";
+      }, duration);
     }
 
     function stopCountdown() {
       clearInterval(countdownInterval);
+      if (alertTimeout) clearTimeout(alertTimeout);
       document.getElementById("display").textContent = "--:--.---";
       document.getElementById("alerts").textContent = "";
       document.getElementById("alerts").className = "";
