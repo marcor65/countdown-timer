@@ -162,42 +162,38 @@
           setTimeout(() => {
             document.getElementById("startButton").style.backgroundColor = "green";
             document.getElementById("startButton").style.color = "white";
+            alerts.textContent = "";
+            alerts.className = "";
           }, 1000);
-
           return;
         }
 
         display.textContent = formatTime(remaining);
-        alerts.textContent = "";
-        alerts.className = "";
 
         const rSec = Math.ceil(remaining / 1000);
 
-        if (rSec <= 10 && lastAlert !== rSec) {
-          alerts.textContent = rSec;
-          alerts.className = "critical";
-          lastAlert = rSec;
-          showAlertForDuration();
-        }
-
-        else if (rSec === 20 && lastAlert !== "-20") {
-          alerts.textContent = "⚠️ -20 seconds";
-          alerts.className = "warning";
-          lastAlert = "-20";
-          showAlertForDuration();
-        }
-
-        else if (rSec === 30 && lastAlert !== "-30") {
-          alerts.textContent = "⚠️ -30 seconds";
-          alerts.className = "warning";
-          lastAlert = "-30";
-          showAlertForDuration();
+        if (!alertVisible) {
+          if (rSec <= 10 && rSec >= 1 && lastAlert !== rSec) {
+            alerts.textContent = rSec;
+            alerts.className = "critical";
+            lastAlert = rSec;
+            showAlertForDuration();
+          } else if (rSec === 20 && lastAlert !== "-20") {
+            alerts.textContent = "⚠️ -20 seconds";
+            alerts.className = "warning";
+            lastAlert = "-20";
+            showAlertForDuration();
+          } else if (rSec === 30 && lastAlert !== "-30") {
+            alerts.textContent = "⚠️ -30 seconds";
+            alerts.className = "warning";
+            lastAlert = "-30";
+            showAlertForDuration();
+          }
         }
       }, 50);
     }
 
     function showAlertForDuration() {
-      if (alertVisible) return;
       alertVisible = true;
       setTimeout(() => {
         document.getElementById("alerts").textContent = "";
@@ -211,7 +207,6 @@
       document.getElementById("display").textContent = "--:--.---";
       document.getElementById("alerts").textContent = "";
       document.getElementById("alerts").className = "";
-
       document.getElementById("startButton").style.backgroundColor = "green";
       document.getElementById("startButton").style.color = "white";
     }
